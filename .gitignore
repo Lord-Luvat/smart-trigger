@@ -1,0 +1,51 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build artifacts
+dist/
+lib/
+
+# Config files
+.env
+.env.*
+
+# Exception for .env.example
+!/.env.example
+
+# IDEs and editors
+.idea/
+.vscode/
+
+# TypeScript
+*.tsbuildinfo
+*.js.map
+*.d.ts
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Generated files
+.lock-wscript
+.wafpickle-*
+*.swp
+*.swo
+*.map
+
+# Compiled files
+*.js
+*.d.ts
+
+# Project lock file
+yarn.lock
+
+# Package-specific files
+# Add any specific files or directories that should be ignored by your package manager here
+# For example:
+# .npmignore
+# .yarnignore
