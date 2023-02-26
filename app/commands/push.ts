@@ -29,16 +29,20 @@ export const postOrder = async (
 };
 
 export interface PushOptions {
-	url: string;
+	baseUrl: string;
 	apiVersion: string;
+	tokenId?: number;
 }
 
 // Take the decoded oracle requests data saved to file
 // and post them to the OrderAPI
-export const pushRequests = async (options: PushOptions) => {
+export const pushRequests = async ({
+	baseUrl,
+	apiVersion,
+	tokenId,
+}: PushOptions) => {
 	// Set the API configuration
-	const baseUrl = options.url;
-	const apiVersion = options.apiVersion;
+
 	const outputDir = `${path
 		.dirname(process.argv[1])
 		.split('/')
@@ -50,12 +54,23 @@ export const pushRequests = async (options: PushOptions) => {
 	console.log(`Using API version: ${apiVersion}`);
 
 	console.log(`Parsing requests from ${outputDir}...`);
-	// Read the requests from the data directory
-	const requests = fs.readdirSync(outputDir).map((file) => {
-		const request = JSON.parse(fs.readFileSync(`${outputDir}/${file}`, 'utf8'));
-		return request;
-	});
 
+	// Read the requests from file
+	// If a tokenId is provided, only read that request
+	// Otherwise, read all the requests
+	const requests: OrderData[] = [];
+	// zero is a valid tokenId, so we need to check for undefined
+	if (typeof tokenId !== 'undefined') {
+		const data = fs.readFileSync(`${outputDir}/${tokenId}.json`, 'utf8');
+		const request = JSON.parse(data);
+		requests.push(request);
+	} else {
+		fs.readdirSync(outputDir).map((file) => {
+			const data = fs.readFileSync(`${outputDir}/${file}`, 'utf8');
+			const request = JSON.parse(data);
+			requests.push(request);
+		});
+	}
 	for (const request of requests) {
 		const orderData: OrderData = {
 			bridge: 'orderpizzav1',
@@ -64,11 +79,7 @@ export const pushRequests = async (options: PushOptions) => {
 			token_id: request.token_id,
 			recipe_id: request.recipe_id,
 		};
-		const response = await postOrder(
-			options.url,
-			options.apiVersion,
-			orderData
-		);
+		const response = await postOrder(baseUrl, apiVersion, orderData);
 		console.log(response);
 	}
 };

@@ -153,12 +153,12 @@ export const saveRequest = (request: IOracleRequestData) => {
 
 export interface FetchOptions {
 	file: string;
-	block: string;
+	block: number;
 }
 
 // Fetch unfulfilled requests from the given block to present
 // and save them to file
-export const fetchRequests = async (options: FetchOptions) => {
+export const fetchRequests = async ({ file, block }: FetchOptions) => {
 	// Get the fromBlock value from the file or command line
 	// Will default to 0 if neither are provided
 	let fromBlock: number;
@@ -170,23 +170,23 @@ export const fetchRequests = async (options: FetchOptions) => {
 	// Tries to set the fromBlock value from the provided file option
 	// If the file option is not provided, it will use the block option
 	// If the block option is not provided, it will default to 0
-	if (options.file) {
+	if (file) {
 		try {
 			const data = JSON.parse(
-				fs.readFileSync(`${dbDir}/${options.file}`, 'utf8')
+				fs.readFileSync(`${dbDir}/${file}`, 'utf8')
 			).fromBlock;
 			fromBlock = parseInt(data);
 			console.log(`fromBlock value: ${fromBlock}
-      retrieved from file: ${options.file}`);
+      retrieved from file: ${file}`);
 		} catch (error) {
 			console.log(
 				`Error reading fromBlock file: ${error} - using fromBlock value from command line or defaulting to 0 if not provided`
 			);
-			fromBlock = parseInt(options.block);
+			fromBlock = block;
 			console.log(`fromBlock value used: ${fromBlock}`);
 		}
 	} else {
-		fromBlock = parseInt(options.block);
+		fromBlock = block;
 		console.log(`fromBlock value used: ${fromBlock}`);
 	}
 
